@@ -1,5 +1,6 @@
 # DeepParcellation Package
-DeepParcellation: fast and accurate fast and accurate brain MRI parcellation by deep learning
+DeepParcellation: fast and accurate brain MRI parcellation by deep learning
+
 
 ### Contributions
 - The project was initiated by Dr. Lim (abysslover) and Dr. Choi (yooha1003).
