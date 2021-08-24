@@ -38,7 +38,15 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 	conda activate deepparc
 	pip install deepparcellation
 ```
-4. Run DeepParcellation
+
+4. To run DeepParcellation using GPU
+```
+	conda install cudnn=7.6.5 -c anaconda -y
+	conda install cudatoolkit=10.1.243 -c conda-forge -y
+	pip unnstall keras -y
+	conda install keras-gpu=2.4.3 -c anaconda -y
+```
+5. Run DeepParcellation
 ```
 	conda activate deepparc
 	deepparcellation -o=/tmp/test --i=./subject-0-0000/test.nii.gz
