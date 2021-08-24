@@ -22,8 +22,8 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 
 ### Prepare T1-weighted MR images
 
-1. Convert MR image to Neuroimaging Informatics Technology Initiative (NIfTI) format.
-2. The parent directory name of a nifti file path will be used as **Subject Id** during prediction.
+1. Convert MR images to Neuroimaging Informatics Technology Initiative (NIfTI) format.
+2. The parent directory name of a NIfTI file path will be used as **Subject Id** during prediction.
 3. You can specify either **an input path** of the NIfTI file or **input direcotry** of many NIfTI files.
 
 ### Install DeepParcellation
@@ -42,6 +42,8 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 ```
 	conda activate deepparc
 	deepparcellation -o=/tmp/test --i=./subject-0-0000/test.nii.gz
+	or
+	deepparcellation -o=/tmp/test --i=./
 ```
 **NOTE**:
 1. You must always **activate the conda enviroment** before running DeepParcellation if you opened a **new console**.
