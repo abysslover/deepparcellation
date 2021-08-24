@@ -1,6 +1,7 @@
 # DeepParcellation Package
 DeepParcellation: fast and accurate fast and accurate brain MRI parcellation by deep learning
 
+
 ### Contributions
 - The project was initiated by Dr. Lim (abysslover) and Dr. Choi (yooha1003).
 - The code is written by Dr. Lim at Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center ([GARD CRC](http://nrcd.re.kr/)), Chosun University.
