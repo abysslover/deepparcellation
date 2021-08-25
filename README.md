@@ -1,8 +1,6 @@
 # DeepParcellation Package
 DeepParcellation: fast and accurate brain MRI parcellation by deep learning
 
-
-
 ### Contributions
 - The project was initiated by Dr. Lim (abysslover) and Dr. Choi (yooha1003).
 - The code is written by Dr. Lim at Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center ([GARD CRC](http://nrcd.re.kr/)), Chosun University.
@@ -10,7 +8,7 @@ DeepParcellation: fast and accurate brain MRI parcellation by deep learning
 Eun-Cheon Lim<sup>1</sup>, Uk-Su Choi<sup>1</sup>, Yul-Wan Sung<sup>2</sup>, Gun-Ho Lee<sup>1</sup> and Jungsoo Gim<sup>1</sup>.
 
 1. Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center, Chosun University, Gwangju, Republic of Korea
-2. Department of Brain Imaging, Tohoku University, Sendai, Miyagi, Japan
+2. Kansei Fukushi Research Institute, Tohoku Fukushi University, Sendai, Miyagi, Japan
 
 - The manuscript will be available in the future.
 
@@ -31,9 +29,9 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
    - Download an Anaconda distribution: [Link](https://www.anaconda.com/distribution/)
 2. Create a Conda environment
 ```
-	conda create -n deepparc
+	conda create -n deepparc python=3.8 -y
 ```
-3. Install DeepParcellation in Linux
+3. Install DeepParcellation using CPU
 ```
 	conda activate deepparc
 	pip install deepparcellation
@@ -41,9 +39,13 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 
 4. To run DeepParcellation using GPU
 ```
+	conda activate deepparc
+	pip install deepparcellation
 	conda install cudnn=7.6.5 -c anaconda -y
 	conda install cudatoolkit=10.1.243 -c conda-forge -y
-	pip unnstall keras -y
+	pip uninstall tensorflow -y
+	pip install tensorflow-gpu==2.2.0
+	pip uninstall keras -y
 	conda install keras-gpu=2.4.3 -c anaconda -y
 ```
 5. Run DeepParcellation
