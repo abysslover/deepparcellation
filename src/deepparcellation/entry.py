@@ -238,8 +238,11 @@ def _predict_batch_cpu(output_dir, input_path, n_cores=-1, roi_bins=list(range(0
     pred_y = np.stack(result_images[:-1], axis=0) * len(original_roi_bins)
     aggregate_and_post_process(output_path_parcellation, output_path_brainmask, output_path_stat, pred_y, whole_brain, input_affine)
 
-def load_prediction_model():
-    from keras.models import model_from_json
+def load_prediction_model(mode="cpu"):
+    if "cpu" == mode:
+        from tensorflow.keras.models import model_from_json
+    else:
+        from keras.models import model_from_json
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     with open(f"{parent_dir}/Attention3DUNet.json", "r") as json_file:
         model = model_from_json(json_file.read())
@@ -258,7 +261,7 @@ def predict_batch(params, gpu_id="0", roi_bins=list(range(0, 112)), atlas="DKT",
     gpus = tf.config.experimental.list_physical_devices("GPU")
     for gpu in gpus:
         tf.config.experimental.set_memory_growth(gpu, True)
-    model = load_prediction_model()
+    model = load_prediction_model(mode="gpu")
     for output_dir, input_path in tqdm(params):
         try:
             _predict_batch(output_dir, input_path, model, roi_bins=roi_bins, atlas=atlas, is_purge=is_purge, verbose=verbose)
@@ -323,12 +326,34 @@ def get_params(args):
         output_dir_subject = f"{args.output_dir}/{subject_id}"
         params = [(output_dir_subject, args.input_path)]
     if None is args.rois:
-        roi_bins = list(range(112))
+        args.rois = list(range(112))
     else:
-        roi_bins = get_deeparcel_rois(args.rois)
-    return params, roi_bins, args.including_gpus, args.excluding_gpus, args.purge_output is not None and args.purge_output
+        args.rois = get_deeparcel_rois(args.rois)
+    args.purge_output = args.purge_output is not None and args.purge_output
+    return params
+
+def check_weight_files():
+    parent_dir = os.path.dirname(os.path.abspath(__file__))
+    an_weight_file = f"{parent_dir}/weights/weight-roi_0.h5"
+    if os.path.exists(an_weight_file) and os.path.getsize(an_weight_file) > 0:
+        return
+    output_path = f"{parent_dir}/weights.tar.gz"
+    print(f"[check_weight_files] Install weights: {output_path}")
+    if not os.path.exists(output_path):
+        input_url = "https://github.com/abysslover/deepparcellation/releases/download/v1.0.0/weights.tar.gz"
+        import urllib.request
+        with urllib.request.urlopen(input_url) as response, open(output_path, "wb") as out_file:
+            data = response.read()
+            out_file.write(data)
+
+    print(f"[check_weight_files] Uncompress weights: {output_path}")
+    import tarfile    
+    with tarfile.open(output_path, "r") as tar:
+        tar.extractall(path=parent_dir)
+    os.remove(output_path)
 
 def main():
+    check_weight_files()
     n_cores = get_available_CPUs()
     
     import argparse
@@ -340,11 +365,11 @@ def main():
     parser.add_argument("-o", "--output_dir", required=False,
                         help="Output directory")
     parser.add_argument("-r", "--rois", required=False,
-                        help="ROIs to be parcellated (refers to the freesurfer ROI)")
+                        help="comma-separated ROIs to be parcellated (refers to the freesurfer ROI)")
     parser.add_argument("-g", "--including_gpus", required=False,
-                        help="numeric GPU IDs that will be used")
+                        help="comma-separated numeric GPU IDs that will be used")
     parser.add_argument("-G", "--excluding_gpus", required=False,
-                        help="numeric GPU IDs that will not be used")
+                        help="comma-separated numeric GPU IDs that will not be used")
     parser.add_argument("-j", "--n_cores", required=False,
                         default=n_cores,
                         help="# CPU cores when running predictions on CPUs")
@@ -354,15 +379,15 @@ def main():
     
     args = parser.parse_args()
     
-    params, roi_bins, including_gpus, excluding_gpus, is_purge = get_params(args)
-    gpus, n_chunks = get_available_GPUs(including_gpus=including_gpus, excluding_gpus=excluding_gpus)
+    params = get_params(args)
+    gpus, n_chunks = get_available_GPUs(including_gpus=args.including_gpus, excluding_gpus=args.excluding_gpus)
     mode = "cpu" if 0 == len(gpus) else "gpu"
     if "gpu" == mode:
         print(f"[main] # samples: {len(params)}, mode: {mode}, # chunks: {n_chunks}")
-        predict_in_batch_mode(params, gpus, n_chunks, roi_bins=roi_bins, is_purge=is_purge)
+        predict_in_batch_mode(params, gpus, n_chunks, roi_bins=args.rois, is_purge=args.purge_output)
     else:
         print(f"[main] # samples: {len(params)}, mode: {mode}")
-        predict_in_batch_mode_cpu(params, n_cores, roi_bins=roi_bins, is_purge=is_purge)
+        predict_in_batch_mode_cpu(params, args.n_cores, roi_bins=args.rois, is_purge=args.purge_output)
 
 
 if __name__ == '__main__':
