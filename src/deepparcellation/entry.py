@@ -185,6 +185,16 @@ def _predict_batch_cpu_core(input_image, roi_bin, roi_bins, excluding_rois, imag
     if (roi_bin not in roi_bins) or (roi_bin in excluding_rois):
         an_roi_image = np.full(input_image.shape[1:-1], 0, dtype=np.int16)
         return an_roi_image
+    import warnings
+    warnings.filterwarnings(action="ignore")
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" 
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    import tensorflow as tf
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    
     model = load_prediction_model()
     model = load_parcellation_model(model, roi_bin)
     if is_not_binarized:
@@ -194,7 +204,7 @@ def _predict_batch_cpu_core(input_image, roi_bin, roi_bins, excluding_rois, imag
         an_roi_image = predict_single_roi_binarized(model, input_image, image_shape)
     return an_roi_image
 
-def _predict_batch_cpu(output_dir, input_path, n_cores=-1, roi_bins=list(range(0, 112)), image_shape=(256,256,256), atlas="DKT", is_purge=False, verbose=False):
+def _predict_batch_cpu(output_dir, input_path, n_cores=-1, roi_bins=list(range(0, 113)), image_shape=(256,256,256), atlas="DKT", is_purge=False, verbose=False):
     if not os.path.exists(input_path):
         return
     final_output_dir = f"{output_dir}/mri"
@@ -299,16 +309,7 @@ def predict_in_batch_mode(params, gpus, n_chunks, roi_bins=list(range(112)), is_
 def predict_in_batch_mode_cpu(params, n_cores=1, roi_bins=list(range(0, 112)), image_shape=(256,256,256), atlas="DKT", is_purge=False, verbose=False):
     if 0 == len(params):
         return
-    import warnings
-    warnings.filterwarnings(action="ignore")
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-    os.environ["OPENBLAS_NUM_THREADS"] = "1"
     print(f"[predict_batch] # cores: {n_cores}")
-    import tensorflow as tf
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-    tf.config.threading.set_inter_op_parallelism_threads(1)
 
     for output_dir, input_path in tqdm(params):
         try:
@@ -370,7 +371,7 @@ def main():
                         help="comma-separated numeric GPU IDs that will be used")
     parser.add_argument("-G", "--excluding_gpus", required=False,
                         help="comma-separated numeric GPU IDs that will not be used")
-    parser.add_argument("-j", "--n_cores", required=False,
+    parser.add_argument("-j", "--n_cores", required=False, type=int,
                         default=n_cores,
                         help="# CPU cores when running predictions on CPUs")
     parser.add_argument("-p", "--purge_output", required=False,
