@@ -5,7 +5,7 @@ DeepParcellation: fast and accurate brain MRI parcellation by deep learning
 - The project was initiated by Dr. Lim (abysslover) and Dr. Choi (yooha1003).
 - The code is written by Dr. Lim at Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center ([GARD CRC](http://nrcd.re.kr/)), Chosun University.
 - This research was conducted in collaborations with the following people:
-Eun-Cheon Lim<sup>1</sup>, Uk-Su Choi<sup>1</sup>, Yul-Wan Sung<sup>2</sup>, Gun-Ho Lee<sup>1</sup> and Jungsoo Gim<sup>1</sup>.
+Eun-Cheon Lim<sup>1</sup>, Uk-Su Choi<sup>1</sup>, Yul-Wan Sung<sup>2</sup>, Kun-Ho Lee<sup>1</sup> and Jungsoo Gim<sup>1</sup>.
 
 1. Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center, Chosun University, Gwangju, Republic of Korea
 2. Kansei Fukushi Research Institute, Tohoku Fukushi University, Sendai, Miyagi, Japan
@@ -31,13 +31,13 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 ```
 	conda create -n deepparc python=3.8 -y
 ```
-3. Install DeepParcellation using CPU
+3. Install DeepParcellation (CPU mode)
 ```
 	conda activate deepparc
 	pip install deepparcellation
 ```
 
-4. To run DeepParcellation using GPU
+4. Install DeepParcellation (GPU mode)
 ```
 	conda activate deepparc
 	pip install deepparcellation
