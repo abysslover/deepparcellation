@@ -318,12 +318,16 @@ def predict_in_batch_mode_cpu(params, n_cores=1, roi_bins=list(range(0, 112)), i
             print(f"[predict_batch] ERROR: {input_path}\n{sys.exc_info()}")
 
 def get_params(args):
+    args.input_path = os.path.abspath(args.input_path)
     # run in batch mode
     if os.path.isdir(args.input_path):
         params = collect_nifti_paths(args.output_dir, args.input_path)
     elif os.path.isfile(args.input_path):
-        subject_id_tokens = args.input_path.split("/")
-        subject_id = subject_id_tokens[-2]
+        if None is args.subject_id:
+            subject_id_tokens = args.input_path.split("/")
+            subject_id = subject_id_tokens[-2]
+        else:
+            subject_id = args.subject_id
         output_dir_subject = f"{args.output_dir}/{subject_id}"
         params = [(output_dir_subject, args.input_path)]
     if None is args.rois:
@@ -365,6 +369,8 @@ def main():
                         help="MR images to run DeepParcellation")
     parser.add_argument("-o", "--output_dir", required=False,
                         help="Output directory")
+    parser.add_argument("-s", "--subject_id", required=False,
+                        help="Subject Id")
     parser.add_argument("-r", "--rois", required=False,
                         help="comma-separated ROIs to be parcellated (refers to the freesurfer ROI)")
     parser.add_argument("-g", "--including_gpus", required=False,
