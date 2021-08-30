@@ -306,7 +306,7 @@ def predict_in_batch_mode(params, gpus, n_chunks, roi_bins=list(range(112)), is_
         a_process.close()
         del a_process
         
-def predict_in_batch_mode_cpu(params, n_cores=1, roi_bins=list(range(0, 112)), image_shape=(256,256,256), atlas="DKT", is_purge=False, verbose=False):
+def predict_in_batch_mode_cpu(params, n_cores=1, roi_bins=list(range(0, 113)), image_shape=(256,256,256), atlas="DKT", is_purge=False, verbose=False):
     if 0 == len(params):
         return
     print(f"[predict_batch] # cores: {n_cores}")
@@ -334,6 +334,7 @@ def get_params(args):
         args.rois = list(range(112))
     else:
         args.rois = get_deeparcel_rois(args.rois)
+    args.rois += [112]
     args.purge_output = args.purge_output is not None and args.purge_output
     return params
 
@@ -395,7 +396,6 @@ def main():
     else:
         print(f"[main] # samples: {len(params)}, mode: {mode}")
         predict_in_batch_mode_cpu(params, args.n_cores, roi_bins=args.rois, is_purge=args.purge_output)
-
 
 if __name__ == '__main__':
     main()
