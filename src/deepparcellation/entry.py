@@ -249,10 +249,7 @@ def _predict_batch_cpu(output_dir, input_path, n_cores=-1, roi_bins=list(range(0
     aggregate_and_post_process(output_path_parcellation, output_path_brainmask, output_path_stat, pred_y, whole_brain, input_affine)
 
 def load_prediction_model(mode="cpu"):
-    if "cpu" == mode:
-        from tensorflow.keras.models import model_from_json
-    else:
-        from keras.models import model_from_json
+    from tensorflow.keras.models import model_from_json
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     with open(f"{parent_dir}/Attention3DUNet.json", "r") as json_file:
         model = model_from_json(json_file.read())
@@ -268,6 +265,13 @@ def predict_batch(params, gpu_id="0", roi_bins=list(range(0, 112)), atlas="DKT",
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     print(f"[predict_batch] GPU_ID: {gpu_id}")
     import tensorflow as tf
+    try:
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+        tf.compat.v1.disable_eager_execution()
+        from tensorflow.python.compiler.mlcompute import mlcompute
+        mlcompute.set_mlc_device(device_name="gpu") # Available options are 'cpu', 'gpu', and ‘any'.
+    except:
+        pass
     gpus = tf.config.experimental.list_physical_devices("GPU")
     for gpu in gpus:
         tf.config.experimental.set_memory_growth(gpu, True)
@@ -338,6 +342,22 @@ def get_params(args):
     args.purge_output = args.purge_output is not None and args.purge_output
     return params
 
+class ProgressBar():
+    def __init__(self):
+        self.pbar = None
+
+    def __call__(self, block_num, block_size, total_size):
+        import progressbar
+        if not self.pbar:
+            self.pbar=progressbar.ProgressBar(maxval=total_size)
+            self.pbar.start()
+
+        downloaded = block_num * block_size
+        if downloaded < total_size:
+            self.pbar.update(downloaded)
+        else:
+            self.pbar.finish()
+
 def check_weight_files():
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     an_weight_file = f"{parent_dir}/weights/weight-roi_0.h5"
@@ -348,9 +368,10 @@ def check_weight_files():
     if not os.path.exists(output_path):
         input_url = "https://github.com/abysslover/deepparcellation/releases/download/v1.0.0/weights.tar.gz"
         import urllib.request
-        with urllib.request.urlopen(input_url) as response, open(output_path, "wb") as out_file:
-            data = response.read()
-            out_file.write(data)
+        urllib.request.urlretrieve(input_url, output_path, ProgressBar())
+        # with urllib.request.urlopen(input_url) as response, open(output_path, "wb") as out_file:
+        #     data = response.read()
+        #     out_file.write(data)
 
     print(f"[check_weight_files] Uncompress weights: {output_path}")
     import tarfile    
