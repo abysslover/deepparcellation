@@ -48,7 +48,18 @@ You should install CUDA-enabled GPU cards with at least 8GB GPU memory manufactu
 	pip uninstall keras -y
 	conda install keras-gpu=2.4.3 -c anaconda -y
 ```
-5. Run DeepParcellation
+5. Install DeepParcellation (Mac with M1 Chip)
+```
+	conda activate deepparc
+	export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
+	export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
+	export CFLAGS="-I/opt/homebrew/opt/openssl/include"
+	export LDFLAGS="-L/opt/homebrew/opt/openssl/lib"
+	conda install -c apple tensorflow-deps -y
+	pip install tensorflow-macos
+	pip install deepparcellation
+```
+6. Run DeepParcellation
 ```
 	conda activate deepparc
 	deepparcellation -o=/tmp/test --i=./subject-0-0000/test.nii.gz

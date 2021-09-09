@@ -6,6 +6,8 @@ Created on Nov 09, 2020
 import sys
 
 def _get_available_GPUs(queue, including_gpus=None, excluding_gpus=None, memory_per_process=7000000000):
+    import platform
+    the_system = platform.system()
     import os
     import warnings
     warnings.filterwarnings(action="ignore")
@@ -43,17 +45,31 @@ def _get_available_GPUs(queue, including_gpus=None, excluding_gpus=None, memory_
         gpu_id = a_device.name.replace("/device:GPU:", "")
         if gpu_id in excluding_gpus or gpu_id not in including_gpus:
             continue
-        # print(a_device.name, a_device.device_type, a_device.memory_limit)
-        if a_device.memory_limit > memory_per_process:
+        if "Darwin" == the_system:
             gpu_dict[gpu_id] = a_device.memory_limit
-            if min_memory > a_device.memory_limit:
-                min_memory = a_device.memory_limit
+            min_memory = 7000000000
+        else:
+            # print(a_device.name, a_device.device_type, a_device.memory_limit)
+            if a_device.memory_limit > memory_per_process:
+                gpu_dict[gpu_id] = a_device.memory_limit
+                if min_memory > a_device.memory_limit:
+                    min_memory = a_device.memory_limit
     n_chunks = min_memory // memory_per_process
     gpus = list(gpu_dict.keys())
     
     queue.put((gpus, n_chunks))
 
 def get_available_GPUs(including_gpus=None, excluding_gpus=None, memory_per_process=7000000000):
+    try:
+        import tensorflow as tf 
+        tf.compat.v1.disable_eager_execution()
+        from tensorflow.python.compiler.mlcompute import mlcompute
+        mlcompute.set_mlc_device(device_name="gpu") # Available options are 'cpu', 'gpu', and ‘any'.
+        gpus = ",".join([str(s) for s in range(8)])
+        n_chunks = 1
+        return gpus, n_chunks
+    except:
+        pass
     import multiprocessing
     q = multiprocessing.Queue()
     arg_dict = {
