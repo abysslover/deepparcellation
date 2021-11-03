@@ -7,8 +7,8 @@ DeepParcellation: fast and accurate brain MRI parcellation by deep learning
 - This research was conducted in collaborations with the following people:
 Eun-Cheon Lim<sup>1</sup>, Uk-Su Choi<sup>1</sup>, Kyu Yeong Choi<sup>1</sup>, Jang Jae Lee<sup>1</sup>, Yul-Wan Sung<sup>2</sup>, Seji Ogawa<sup>2</sup>, Byeong Chae Kim<sup>3</sup> Kun-Ho Lee<sup>1</sup> and Jungsoo Gim<sup>1</sup>.
 
-1. Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center, Chosun University, Gwangju, Republic of Korea
-2. Kansei Fukushi Research Institute, Tohoku Fukushi University, Sendai, Miyagi, Japan
+1. Gwangju Alzheimer's & Related Dementias (GARD) Cohort Research Center, Chosun University, Gwangju, 61452, Republic of Korea
+2. Kansei Fukushi Research Institute, Tohoku Fukushi University, Sendai, Miyagi, 9893201, Japan
 3. Department of Neurology, Chonnam National University Medical School, Gwangju, 61469, Republic of Korea
 
 - The manuscript will be available in the future.
