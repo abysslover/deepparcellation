@@ -60,6 +60,11 @@ def _get_available_GPUs(queue, including_gpus=None, excluding_gpus=None, memory_
     queue.put((gpus, n_chunks))
 
 def get_available_GPUs(including_gpus=None, excluding_gpus=None, memory_per_process=7000000000):
+    import os
+    import warnings
+    warnings.filterwarnings(action="ignore")
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" 
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     try:
         import tensorflow as tf 
         tf.compat.v1.disable_eager_execution()
