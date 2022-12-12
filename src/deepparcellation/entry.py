@@ -388,7 +388,7 @@ def check_weight_files():
                 raise Exception(f"[safe_extract] Error: Attempted path traversal in tar file: {path_target}")
             tar.extractall(path_target) 
     with tarfile.open(output_path, "r") as tar:
-        safe_extract(tar, path=parent_dir)
+        safe_extract(tar, path_target=parent_dir)
     os.remove(output_path)
 
 def main():
